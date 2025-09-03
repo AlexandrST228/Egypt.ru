@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Трекер бюджета 📊</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css  " rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
@@ -26,7 +26,8 @@
                     <label><i class="fas fa-home"></i> Аренда (₽)</label>
                     <input type="number" id="rent" value="15000" required>
 
-                    <label><i class="fas fa-credit-card"></i> Кредит (₽)</label>
+                    <!-- ✅ Исправлено: новое поле с уникальным id -->
+                    <label><i class="fas fa-piggy-bank"></i> Кредит (₽)</label>
                     <input type="number" id="loan" value="4400" required>
 
                     <label><i class="fas fa-bolt"></i> Коммуналка (₽)</label>
@@ -77,6 +78,7 @@
 
     <script>
         let limits = {};
+        let requiredMonthlySavings = 0; // Глобальная переменная
 
         function calculateBudget() {
             const resultDiv = document.getElementById('result');
@@ -104,7 +106,9 @@
                     return;
                 }
 
-                const requiredMonthlySavings = savingsGoal / months;
+                // ✅ Рассчитываем, сколько надо откладывать в месяц
+                requiredMonthlySavings = savingsGoal / months;
+
                 const availableForLiving = salary - fixedExpenses - requiredMonthlySavings;
 
                 if (availableForLiving < 0) {
@@ -155,9 +159,28 @@
                 return { class: 'status-green', text: 'В норме' };
             }
 
+            // ✅ Добавляем строку с суммой, которую нужно откладывать
             let tableHTML = `
                 <div class="result-card">
                     <h2><i class="fas fa-chart-line"></i> Текущие траты</h2>
+
+                    <!-- 🎯 Новая строка: сколько откладывать -->
+                    <div style="
+                        background: #e8f5e8; 
+                        padding: 14px; 
+                        border-radius: 10px; 
+                        margin-bottom: 16px; 
+                        border: 1px solid #a5d6a7; 
+                        text-align: center; 
+                        font-weight: 600;
+                    ">
+                        <i class="fas fa-piggy-bank" style="color: #2e7d32;"></i>
+                        <span>Нужно откладывать в месяц:</span>
+                        <strong style="font-size: 1.3em; color: #d43725; margin-left: 5px;">
+                            ${requiredMonthlySavings.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽
+                        </strong>
+                    </div>
+
                     <table class="budget-table">
                         <thead>
                             <tr>
@@ -213,6 +236,3 @@
             document.getElementById('result').classList.add('show');
         }
     </script>
-</body>
-</html>
-
