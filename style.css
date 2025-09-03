@@ -1,5 +1,4 @@
-
-        * {
+       * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
@@ -57,14 +56,14 @@
             font-size: 1.1em;
         }
 
-        form.grid {
+        .grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 18px;
         }
 
         @media (max-width: 600px) {
-            form.grid {
+            .grid {
                 grid-template-columns: 1fr;
             }
         }
