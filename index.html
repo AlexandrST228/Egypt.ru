@@ -155,59 +155,68 @@
                 return { class: 'status-green', text: 'В норме' };
             }
 
-            let tableHTML = `
-                <div class="result-card">
-                    <h2><i class="fas fa-chart-line"></i> Текущие траты</h2>
-                    <table class="budget-table">
-                        <thead>
-                            <tr>
-                                <th>Категория</th>
-                                <th>Лимит</th>
-                                <th>Потрачено</th>
-                                <th>Осталось</th>
-                                <th>Статус</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><i class="fas fa-apple-alt" style="color:#27ae60;"></i> Еда</td>
-                                <td class="amount">${limits.food.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
-                                <td class="amount">${spentFood.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
-                                <td class="amount">${remaining.food.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
-                                <td><span class="status ${getStatus(remaining.food, limits.food).class}">${getStatus(remaining.food, limits.food).text}</span></td>
-                            </tr>
-                            <tr>
-                                <td><i class="fas fa-bus" style="color:#3498db;"></i> Транспорт</td>
-                                <td class="amount">${limits.transport.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
-                                <td class="amount">${spentTransport.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
-                                <td class="amount">${remaining.transport.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
-                                <td><span class="status ${getStatus(remaining.transport, limits.transport).class}">${getStatus(remaining.transport, limits.transport).text}</span></td>
-                            </tr>
-                            <tr>
-                                <td><i class="fas fa-toilet-paper" style="color:#9b59b6;"></i> Личные</td>
-                                <td class="amount">${limits.personal.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
-                                <td class="amount">${spentPersonal.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
-                                <td class="amount">${remaining.personal.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
-                                <td><span class="status ${getStatus(remaining.personal, limits.personal).class}">${getStatus(remaining.personal, limits.personal).text}</span></td>
-                            </tr>
-                            <tr>
-                                <td><i class="fas fa-theater-masks" style="color:#f39c12;"></i> Развлечения</td>
-                                <td class="amount">${limits.misc.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
-                                <td class="amount">${spentMisc.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
-                                <td class="amount">${remaining.misc.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
-                                <td><span class="status ${getStatus(remaining.misc, limits.misc).class}">${getStatus(remaining.misc, limits.misc).text}</span></td>
-                            </tr>
-                            <tr class="total-row">
-                                <td><strong>Итого</strong></td>
-                                <td class="amount">${(limits.food + limits.transport + limits.personal + limits.misc).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
-                                <td class="amount">${(spentFood + spentTransport + spentPersonal + spentMisc).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
-                                <td class="amount">${(remaining.food + remaining.transport + remaining.personal + remaining.misc).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
-                                <td></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            `;
+          let tableHTML = `
+    <div class="result-card">
+        <h2><i class="fas fa-chart-line"></i> Текущие траты</h2>
+        
+        <!-- Новая строка: сколько откладывать на отдых -->
+        <div style="background: #e8f5e8; padding: 14px; border-radius: 10px; margin-bottom: 16px; border: 1px solid #a5d6a7; text-align: center;">
+            <strong>🎯 На отдых нужно откладывать:</strong>
+            <span style="font-size: 1.3em; color: #2e7d32; margin-left: 10px;">
+                ${requiredMonthlySavings.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽
+            </span>
+        </div>
+
+        <table class="budget-table">
+            <thead>
+                <tr>
+                    <th>Категория</th>
+                    <th>Лимит</th>
+                    <th>Потрачено</th>
+                    <th>Осталось</th>
+                    <th>Статус</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><i class="fas fa-apple-alt" style="color:#27ae60;"></i> Еда</td>
+                    <td class="amount">${limits.food.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
+                    <td class="amount">${spentFood.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
+                    <td class="amount">${remaining.food.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
+                    <td><span class="status ${getStatus(remaining.food, limits.food).class}">${getStatus(remaining.food, limits.food).text}</span></td>
+                </tr>
+                <tr>
+                    <td><i class="fas fa-bus" style="color:#3498db;"></i> Транспорт</td>
+                    <td class="amount">${limits.transport.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
+                    <td class="amount">${spentTransport.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
+                    <td class="amount">${remaining.transport.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
+                    <td><span class="status ${getStatus(remaining.transport, limits.transport).class}">${getStatus(remaining.transport, limits.transport).text}</span></td>
+                </tr>
+                <tr>
+                    <td><i class="fas fa-toilet-paper" style="color:#9b59b6;"></i> Личные</td>
+                    <td class="amount">${limits.personal.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
+                    <td class="amount">${spentPersonal.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
+                    <td class="amount">${remaining.personal.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
+                    <td><span class="status ${getStatus(remaining.personal, limits.personal).class}">${getStatus(remaining.personal, limits.personal).text}</span></td>
+                </tr>
+                <tr>
+                    <td><i class="fas fa-theater-masks" style="color:#f39c12;"></i> Развлечения</td>
+                    <td class="amount">${limits.misc.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
+                    <td class="amount">${spentMisc.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
+                    <td class="amount">${remaining.misc.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
+                    <td><span class="status ${getStatus(remaining.misc, limits.misc).class}">${getStatus(remaining.misc, limits.misc).text}</span></td>
+                </tr>
+                <tr class="total-row">
+                    <td><strong>Итого</strong></td>
+                    <td class="amount">${(limits.food + limits.transport + limits.personal + limits.misc).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
+                    <td class="amount">${(spentFood + spentTransport + spentPersonal + spentMisc).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
+                    <td class="amount">${(remaining.food + remaining.transport + remaining.personal + remaining.misc).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+`;
 
             document.getElementById('result').innerHTML = tableHTML;
             document.getElementById('result').classList.add('show');
@@ -215,4 +224,5 @@
     </script>
 </body>
 </html>
+
 
