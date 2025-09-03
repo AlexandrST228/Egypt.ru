@@ -3,115 +3,214 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Планировщик бюджета</title>
+    <title>Трекер бюджета 📊</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
 </head>
 <body>
     <div class="container">
-        <h1>💰 Планировщик бюджета</h1>
-        <p class="subtitle">Узнайте, сколько вы можете тратить на еду, транспорт и другие нужды, чтобы накопить на отпуск.</p>
+        <header>
+            <h1><i class="fas fa-wallet"></i> Трекер личного бюджета</h1>
+            <p>Следите за тратами и достигайте целей 🎯</p>
+        </header>
 
-        <form id="budgetForm">
-            <label>Зарплата (₽):</label>
-            <input type="number" id="salary" value="50000" required>
+        <div class="content">
+            <!-- Форма расчёта лимитов -->
+            <div class="section">
+                <h3><i class="fas fa-calculator"></i> 1. Рассчитать лимиты</h3>
+                <form id="budgetForm" class="grid">
+                    <label><i class="fas fa-coins"></i> Зарплата (₽)</label>
+                    <input type="number" id="salary" value="50000" required>
 
-            <label>Аренда (₽):</label>
-            <input type="number" id="rent" value="15000" required>
+                    <label><i class="fas fa-home"></i> Аренда (₽)</label>
+                    <input type="number" id="rent" value="15000" required>
 
-            <label>Кредит (₽):</label>
-            <input type="number" id="loan" value="4400" required>
+                    <label><i class="fas fa-credit-card"></i> Кредит (₽)</label>
+                    <input type="number" id="loan" value="4400" required>
 
-            <label>Коммуналка (₽):</label>
-            <input type="number" id="utilities" value="2000" required>
+                    <label><i class="fas fa-bolt"></i> Коммуналка (₽)</label>
+                    <input type="number" id="utilities" value="2000" required>
 
-            <label>Интернет/связь (₽):</label>
-            <input type="number" id="internet" value="300" required>
+                    <label><i class="fas fa-wifi"></i> Интернет/связь (₽)</label>
+                    <input type="number" id="internet" value="300" required>
 
-            <label>Цель (₽):</label>
-            <input type="number" id="savingsGoal" value="55000" required>
+                    <label><i class="fas fa-flag-checkered"></i> Цель (₽)</label>
+                    <input type="number" id="savingsGoal" value="55000" required>
 
-            <label>Срок (мес):</label>
-            <input type="number" id="months" value="3" min="1" required>
-        </form>
+                    <label><i class="fas fa-calendar-alt"></i> Срок (мес)</label>
+                    <input type="number" id="months" value="3" min="1" required>
+                </form>
+                <button onclick="calculateBudget()">
+                    <i class="fas fa-sliders-h"></i> Рассчитать лимиты
+                </button>
+            </div>
 
-        <button onclick="calculateBudget()">Рассчитать бюджет</button>
+            <!-- Форма ввода фактических трат -->
+            <div class="section" id="spendingSection" style="display: none;">
+                <h3><i class="fas fa-shopping-cart"></i> 2. Введите свои траты</h3>
+                <form id="spendingForm" class="grid">
+                    <label><i class="fas fa-apple-alt" style="color:#27ae60;"></i> Потрачено на еду (₽)</label>
+                    <input type="number" id="spentFood" value="0" min="0" oninput="updateTracking()">
 
-        <div id="result"></div>
+                    <label><i class="fas fa-bus" style="color:#3498db;"></i> Потрачено на транспорт (₽)</label>
+                    <input type="number" id="spentTransport" value="0" min="0" oninput="updateTracking()">
+
+                    <label><i class="fas fa-toilet-paper" style="color:#9b59b6;"></i> Потрачено на личное (₽)</label>
+                    <input type="number" id="spentPersonal" value="0" min="0" oninput="updateTracking()">
+
+                    <label><i class="fas fa-theater-masks" style="color:#f39c12;"></i> Потрачено на развлечения (₽)</label>
+                    <input type="number" id="spentMisc" value="0" min="0" oninput="updateTracking()">
+                </form>
+            </div>
+
+            <!-- Результат -->
+            <div id="result">
+                <!-- Сюда будет подставляться таблица -->
+            </div>
+        </div>
 
         <div class="footer">
-            © <script>document.write(new Date().getFullYear())</script> Бюджет-планировщик | Мечтай о море 🌴
+            <i class="fas fa-sun"></i> © <script>document.write(new Date().getFullYear())</script> Бюджет-трекер | Мечтай о Египте 🇪🇬
         </div>
     </div>
 
     <script>
+        let limits = {};
+
         function calculateBudget() {
-            // Получаем значения
-            const salary = parseFloat(document.getElementById('salary').value);
-            const rent = parseFloat(document.getElementById('rent').value);
-            const loan = parseFloat(document.getElementById('loan').value);
-            const utilities = parseFloat(document.getElementById('utilities').value);
-            const internet = parseFloat(document.getElementById('internet').value);
-            const savingsGoal = parseFloat(document.getElementById('savingsGoal').value);
-            const months = parseInt(document.getElementById('months').value);
-
             const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = '';
+            resultDiv.classList.remove('show');
 
-            // Проверка
-            if (salary <= 0 || months <= 0) {
-                resultDiv.innerHTML = `<div class="error">Пожалуйста, корректно заполните все поля.</div>`;
-                return;
-            }
+            const salary = parseFloat(document.getElementById('salary').value) || 0;
+            const rent = parseFloat(document.getElementById('rent').value) || 0;
+            const loan = parseFloat(document.getElementById('loan').value) || 0;
+            const utilities = parseFloat(document.getElementById('utilities').value) || 0;
+            const internet = parseFloat(document.getElementById('internet').value) || 0;
+            const savingsGoal = parseFloat(document.getElementById('savingsGoal').value) || 0;
+            const months = parseInt(document.getElementById('months').value) || 1;
 
-            const fixedExpenses = rent + loan + utilities + internet;
-            if (fixedExpenses >= salary) {
-                resultDiv.innerHTML = `<div class="error">Обязательные расходы превышают доход. Невозможно откладывать.</div>`;
-                return;
-            }
+            setTimeout(() => {
+                if (salary <= 0 || months <= 0) {
+                    resultDiv.innerHTML = `<div class="error"><i class="fas fa-exclamation-triangle"></i> Пожалуйста, заполните все поля.</div>`;
+                    resultDiv.classList.add('show');
+                    return;
+                }
 
-            const requiredMonthlySavings = savingsGoal / months;
-            const availableForLiving = salary - fixedExpenses - requiredMonthlySavings;
+                const fixedExpenses = rent + loan + utilities + internet;
+                if (fixedExpenses > salary) {
+                    resultDiv.innerHTML = `<div class="error"><i class="fas fa-times-circle"></i> Расходы (${fixedExpenses.toLocaleString()} ₽) превышают доход.</div>`;
+                    resultDiv.classList.add('show');
+                    return;
+                }
 
-            if (availableForLiving < 0) {
-                const deficit = Math.abs(availableForLiving).toFixed(0);
-                resultDiv.innerHTML = `<div class="error">Невозможно накопить ${savingsGoal.toLocaleString()} ₽ за ${months} мес. Нужно ещё ${deficit} ₽ в месяц.</div>`;
-                return;
-            }
+                const requiredMonthlySavings = savingsGoal / months;
+                const availableForLiving = salary - fixedExpenses - requiredMonthlySavings;
 
-            // Распределяем оставшееся
-            const limits = {
-                food: availableForLiving * 0.5,
-                transport: availableForLiving * 0.2,
-                personal: availableForLiving * 0.15,
-                misc: availableForLiving * 0.15
+                if (availableForLiving < 0) {
+                    const deficit = Math.abs(availableForLiving).toFixed(0);
+                    resultDiv.innerHTML = `<div class="error"><i class="fas fa-ban"></i> Не хватает ${deficit.replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽ в месяц.</div>`;
+                    resultDiv.classList.add('show');
+                    return;
+                }
+
+                // Сохраняем лимиты
+                limits = {
+                    food: availableForLiving * 0.5,
+                    transport: availableForLiving * 0.2,
+                    personal: availableForLiving * 0.15,
+                    misc: availableForLiving * 0.15
+                };
+
+                // Показываем форму ввода трат
+                document.getElementById('spendingSection').style.display = 'block';
+
+                // Первичный расчёт
+                updateTracking();
+
+                resultDiv.classList.add('show');
+            }, 150);
+        }
+
+        function updateTracking() {
+            if (Object.keys(limits).length === 0) return;
+
+            const spentFood = parseFloat(document.getElementById('spentFood').value) || 0;
+            const spentTransport = parseFloat(document.getElementById('spentTransport').value) || 0;
+            const spentPersonal = parseFloat(document.getElementById('spentPersonal').value) || 0;
+            const spentMisc = parseFloat(document.getElementById('spentMisc').value) || 0;
+
+            const remaining = {
+                food: limits.food - spentFood,
+                transport: limits.transport - spentTransport,
+                personal: limits.personal - spentPersonal,
+                misc: limits.misc - spentMisc
             };
 
-            let resultHTML = `
-                <div class="result">
-                    <h2>✅ Цель достижима!</h2>
-                    <p>Вы можете тратить в месяц на:</p>
-                    <div class="limits">
-                        <div class="limit-item">
-                            Еда
-                            <span class="amount">${limits.food.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</span>
-                        </div>
-                        <div class="limit-item">
-                            Транспорт
-                            <span class="amount">${limits.transport.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</span>
-                        </div>
-                        <div class="limit-item">
-                            Личные расходы
-                            <span class="amount">${limits.personal.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</span>
-                        </div>
-                        <div class="limit-item">
-                            Развлечения
-                            <span class="amount">${limits.misc.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</span>
-                        </div>
-                    </div>
-                    <p><strong>Всего на "жизнь":</strong> ${availableForLiving.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</p>
+            // Функция статуса
+            function getStatus(rem, limit) {
+                const percent = (rem / limit) * 100;
+                if (percent <= 20) return { class: 'status-red', text: 'Перерасход' };
+                if (percent <= 50) return { class: 'status-yellow', text: 'Близко' };
+                return { class: 'status-green', text: 'В норме' };
+            }
+
+            let tableHTML = `
+                <div class="result-card">
+                    <h2><i class="fas fa-chart-line"></i> Текущие траты</h2>
+                    <table class="budget-table">
+                        <thead>
+                            <tr>
+                                <th>Категория</th>
+                                <th>Лимит</th>
+                                <th>Потрачено</th>
+                                <th>Осталось</th>
+                                <th>Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><i class="fas fa-apple-alt" style="color:#27ae60;"></i> Еда</td>
+                                <td class="amount">${limits.food.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
+                                <td class="amount">${spentFood.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
+                                <td class="amount">${remaining.food.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
+                                <td><span class="status ${getStatus(remaining.food, limits.food).class}">${getStatus(remaining.food, limits.food).text}</span></td>
+                            </tr>
+                            <tr>
+                                <td><i class="fas fa-bus" style="color:#3498db;"></i> Транспорт</td>
+                                <td class="amount">${limits.transport.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
+                                <td class="amount">${spentTransport.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
+                                <td class="amount">${remaining.transport.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
+                                <td><span class="status ${getStatus(remaining.transport, limits.transport).class}">${getStatus(remaining.transport, limits.transport).text}</span></td>
+                            </tr>
+                            <tr>
+                                <td><i class="fas fa-toilet-paper" style="color:#9b59b6;"></i> Личные</td>
+                                <td class="amount">${limits.personal.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
+                                <td class="amount">${spentPersonal.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
+                                <td class="amount">${remaining.personal.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
+                                <td><span class="status ${getStatus(remaining.personal, limits.personal).class}">${getStatus(remaining.personal, limits.personal).text}</span></td>
+                            </tr>
+                            <tr>
+                                <td><i class="fas fa-theater-masks" style="color:#f39c12;"></i> Развлечения</td>
+                                <td class="amount">${limits.misc.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
+                                <td class="amount">${spentMisc.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
+                                <td class="amount">${remaining.misc.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
+                                <td><span class="status ${getStatus(remaining.misc, limits.misc).class}">${getStatus(remaining.misc, limits.misc).text}</span></td>
+                            </tr>
+                            <tr class="total-row">
+                                <td><strong>Итого</strong></td>
+                                <td class="amount">${(limits.food + limits.transport + limits.personal + limits.misc).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
+                                <td class="amount">${(spentFood + spentTransport + spentPersonal + spentMisc).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
+                                <td class="amount">${(remaining.food + remaining.transport + remaining.personal + remaining.misc).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽</td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             `;
 
-            resultDiv.innerHTML = resultHTML;
+            document.getElementById('result').innerHTML = tableHTML;
+            document.getElementById('result').classList.add('show');
         }
     </script>
 </body>
